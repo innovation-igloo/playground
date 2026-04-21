@@ -1,0 +1,54 @@
+llm:
+  base_url: "https://YOUR_SPCS_ENDPOINT.snowflakecomputing.app/v1"
+  model: "your-model-name"
+  max_tokens: 2048
+  temperature: 0.7
+  streaming: true
+
+snowflake:
+  account: "YOUR_ACCOUNT_IDENTIFIER"
+  warehouse: "YOUR_WAREHOUSE"
+
+tools:
+  # NOTE: the config key `cortex_analyst` is retained for backwards
+  # compatibility with existing deployments. The LLM-facing tool name
+  # exposed by this backend is `cortex_agent` — see agent/tools/base.py.
+  cortex_analyst:
+    backend: "rest"
+    semantic_view: "YOUR_DB.YOUR_SCHEMA.YOUR_SEMANTIC_VIEW"
+    # Optional: override the generic tool description shown to the LLM.
+    # When set, the LLM sees this instead of the default hardcoded string in
+    # base.py, giving it accurate context about what to delegate and when.
+    # description: |
+    #   Describe what this Cortex Agent knows and what questions it can answer.
+    #   Include data domains, available topics, tracked entities, and date range.
+    rest:
+      timeout_seconds: 30
+      stream: false
+
+agent:
+  checkpointer: "memory"
+  max_turns: 10
+  system_prompt: |
+    You are an orchestrator in a multi-agent framework powered by Snowflake.
+
+    Your role is to understand the user's request and delegate to the
+    appropriate specialist agent via your available tools. Each tool
+    represents a Cortex Agent with its own data, skills, and context.
+
+    Guidelines:
+    - Always use a tool when the question can be answered by a downstream agent.
+    - You may call multiple tools in sequence to synthesize a complete answer.
+    - Summarize and interpret results — do not just relay raw output.
+    - If no tool is relevant, answer directly from your own knowledge.
+    - Be concise. Lead with the insight, follow with supporting detail.
+
+server:
+  host: "0.0.0.0"
+  port: 8080
+  # Add your frontend origins here. Wildcards are NOT supported when
+  # using credentials. For production, replace with your specific
+  # frontend origin (e.g. https://your-ui.example.com).
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://localhost:5173"

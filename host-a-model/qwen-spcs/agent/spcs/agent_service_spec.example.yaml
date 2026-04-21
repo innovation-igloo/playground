@@ -1,0 +1,50 @@
+# ============================================================
+# agent_service_spec.example.yaml
+#
+# REFERENCE ONLY. The actual deploy uses the inline SPECIFICATION
+# inside create_service.sql. This file exists to document the
+# service spec shape for developers reading the repo.
+#
+# To customize the live service, edit create_service.sql and
+# re-run `make service-deploy` (or `make service-upgrade` for
+# config-only changes).
+# ============================================================
+
+spec:
+  containers:
+    - name: agent
+      image: /<db>/<schema>/agent_repo/market-intel-agent:latest
+      env:
+        CONFIG_PATH: /app/config/config.yaml
+      secrets:
+        - snowflakeSecret: AGENT_PAT
+          secretKeyRef: secret_string
+          envVarName: SNOWFLAKE_PAT
+      resources:
+        requests:
+          cpu: "1"
+          memory: 2Gi
+        limits:
+          cpu: "2"
+          memory: 4Gi
+      volumeMounts:
+        - name: config
+          mountPath: /app/config
+  endpoints:
+    - name: agent-api
+      port: 8080
+      public: true
+      protocol: HTTP
+  volumes:
+    - name: config
+      source: "@<db>.<schema>.AGENT_STAGE"
+      uid: 0
+      gid: 0
+  logExporters:
+    eventTableConfig:
+      logLevel: INFO
+
+serviceRoles:
+  - name: agent_user
+    endpoints:
+      - agent-api

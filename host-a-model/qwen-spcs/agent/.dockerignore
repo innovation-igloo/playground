@@ -1,0 +1,12 @@
+logs/
+ui/node_modules
+ui/dist
+**/__pycache__
+**/*.pyc
+**/*.pyo
+.env
+config.yaml
+spcs/agent_service_spec.yaml
+.venv
+.pytest_cache
+tests/

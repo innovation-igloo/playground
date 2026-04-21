@@ -1,0 +1,36 @@
+spec:
+  containers:
+  - name: vllm-qwen
+    image: /YOUR_DATABASE/YOUR_SCHEMA/YOUR_IMAGE_REPO/vllm-qwen:v1
+    command:
+    - /entrypoint.sh
+    readinessProbe:
+      port: 8000
+      path: /health
+    resources:
+      requests:
+        memory: 100G
+        nvidia.com/gpu: 4
+      limits:
+        memory: 120G
+        nvidia.com/gpu: 4
+    volumeMounts:
+    - name: model-weights
+      mountPath: /models
+  endpoints:
+  - name: inference
+    port: 8000
+    public: true
+    protocol: HTTP
+  volumes:
+  - name: model-weights
+    source: "@YOUR_DATABASE.YOUR_SCHEMA.YOUR_MODEL_STAGE"
+    uid: 0
+    gid: 0
+  logExporters:
+    eventTableConfig:
+      logLevel: INFO
+serviceRoles:
+- name: inference_user
+  endpoints:
+  - inference

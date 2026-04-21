@@ -1,0 +1,7 @@
+.env
+qwen-opus-dist/
+qwen-opus-dist-awq/
+logs/
+docs/
+spcs/service_spec.yaml
+stage/upload_weights.sh

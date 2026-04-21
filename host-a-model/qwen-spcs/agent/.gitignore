@@ -1,0 +1,12 @@
+.env
+config.yaml
+logs/
+spcs/agent_service_spec.yaml
+ui/dist/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+dist/
+build/
+*.egg-info/
